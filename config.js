@@ -7,7 +7,7 @@
 window.RESTAURANT_CONFIG = {
     // 1. Brand Identity (Mudoven Cafe • Your Forever Happy Place • Est. 2012)
     name: "Mudoven",
-    subname: "MUDOVEN CAF • EST. 2012",
+    subname: "MUDOVEN CAFE • EST. 2012",
     hindiTitleUrl: "mudoven_title.png?v=2",
     tagline: "YOUR FOREVER HAPPY PLACE • WE SPEAK THE GOOD FOOD LANGUAGE",
     highlight: "Wood-Fired Pizzas • Handcrafted Coffee • Global Cafe & Dining",
