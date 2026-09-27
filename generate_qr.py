@@ -429,23 +429,31 @@ def draw_brand_header(canvas, draw, w=1200):
 
 def draw_footer(canvas, draw, w=1200):
     """
-    Draw the Bottom Address & Phone Box + Gold Sparkle Thank-You Footer
-    over a rich dark Midnight-Obsidian glass panel.
+    Draw the Enlarged (15% larger) Bottom Address & Phone Box + Gold Sparkle Thank-You Footer
+    for effortless readability even on compact printed cards/sachets.
     """
-    font_addr = get_font(22, bold=False)
-    font_phone = get_font(27, bold=True)
+    font_addr = get_font(25, bold=True)
+    font_phone = get_font(34, bold=True)
     font_thanks = get_font(28, bold=False, italic=True, serif=True)
 
-    info_x1, info_y1 = 115, 1525
-    info_x2, info_y2 = w - 115, 1658
+    info_x1, info_y1 = 90, 1488
+    info_x2, info_y2 = w - 90, 1656
 
     glass = Image.new("RGBA", (w, 1800), (0, 0, 0, 0))
     gdraw = ImageDraw.Draw(glass)
     gdraw.rounded_rectangle(
         [info_x1, info_y1, info_x2, info_y2],
-        radius=12,
-        fill=(9, 13, 24, 230),
+        radius=16,
+        fill=(9, 13, 24, 238),
         outline=(212, 175, 55, 255),
+        width=3
+    )
+    # Subtle inner gold pill highlight behind phone number for extra print contrast
+    gdraw.rounded_rectangle(
+        [info_x1 + 140, info_y1 + 78, info_x2 - 140, info_y2 - 18],
+        radius=12,
+        fill=(212, 175, 55, 34),
+        outline=(247, 223, 148, 135),
         width=2
     )
     canvas_rgba = canvas.convert("RGBA")
@@ -454,17 +462,17 @@ def draw_footer(canvas, draw, w=1200):
 
     addr_text = "Opp. Bharat Petrol Pump, AB Road, Pigdamber, Rau, Indore"
     bbox = draw.textbbox((0, 0), addr_text, font=font_addr)
-    draw.text(((w - (bbox[2] - bbox[0])) / 2, info_y1 + 24), addr_text, fill=(248, 245, 238), font=font_addr)
+    draw.text(((w - (bbox[2] - bbox[0])) / 2, info_y1 + 24), addr_text, fill=(250, 247, 240), font=font_addr)
 
     phone_text = "Call / Reservation: 88891 77701"
     bbox = draw.textbbox((0, 0), phone_text, font=font_phone)
-    draw.text(((w - (bbox[2] - bbox[0])) / 2, info_y1 + 70), phone_text, fill=(247, 223, 148), font=font_phone)
+    draw.text(((w - (bbox[2] - bbox[0])) / 2, info_y1 + 92), phone_text, fill=(249, 226, 148), font=font_phone)
 
     thanks_text = "Thank you for dining with us!"
     bbox = draw.textbbox((0, 0), thanks_text, font=font_thanks)
     tw = bbox[2] - bbox[0]
     tx = (w - tw) / 2
-    ty = 1692
+    ty = 1690
     draw.text((tx, ty), thanks_text, fill=(247, 223, 148), font=font_thanks)
 
     draw_sparkle(draw, tx - 32, ty + 16, radius=11, color=(247, 223, 148))
@@ -473,7 +481,7 @@ def draw_footer(canvas, draw, w=1200):
 
 def build_hub_standee(config, bg_img, output_filenames=["table_standee_printable.png", "standee_front_printable.png"]):
     """
-    Generate the 300 DPI Primary Table Standee with generous center breathing room.
+    Generate the 300 DPI Primary Table Standee with reduced gap below QR code and enlarged address/phone box.
     """
     w, h = 1200, 1800
     canvas = bg_img.copy()
@@ -486,7 +494,7 @@ def build_hub_standee(config, bg_img, output_filenames=["table_standee_printable
 
     cta_text = "SCAN TO CONNECT"
     bbox = draw.textbbox((0, 0), cta_text, font=font_cta)
-    draw.text(((w - (bbox[2] - bbox[0])) / 2, 505), cta_text, fill=(255, 255, 255), font=font_cta)
+    draw.text(((w - (bbox[2] - bbox[0])) / 2, 512), cta_text, fill=(255, 255, 255), font=font_cta)
 
     # Two Pill Badges: [G Rate Us on Google] and [Follow Us on Instagram]
     label_g = "Rate Us on Google"
@@ -494,7 +502,7 @@ def build_hub_standee(config, bg_img, output_filenames=["table_standee_printable
     bbox_g = draw.textbbox((0, 0), label_g, font=font_pill)
     bbox_i = draw.textbbox((0, 0), label_i, font=font_pill)
 
-    pill_y = 582
+    pill_y = 588
     pill_h = 54
     pill_w_g = (bbox_g[2] - bbox_g[0]) + 84
     pill_w_i = (bbox_i[2] - bbox_i[0]) + 84
@@ -519,12 +527,12 @@ def build_hub_standee(config, bg_img, output_filenames=["table_standee_printable
     qr_url = config.get("landingPageUrl", "https://hospitalityqr.github.io/MUDOVEN-QR/?v=1")
     qr_img = generate_styled_qr(qr_url, box_size=18, border=2, fill_color=(10, 14, 24))
 
-    card_size = 730
-    qr_size = 650
+    card_size = 752
+    qr_size = 672
     qr_img = qr_img.resize((qr_size, qr_size), Image.Resampling.LANCZOS)
 
     card_x = int((w - card_size) / 2)
-    card_y = 695
+    card_y = 690
 
     shadow_layer = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     sdraw = ImageDraw.Draw(shadow_layer)
@@ -556,7 +564,7 @@ def build_hub_standee(config, bg_img, output_filenames=["table_standee_printable
 
 def build_dual_direct_standee(config, bg_img, output_filename="standee_dual_direct_static.png"):
     """
-    Generate 300 DPI Dual Direct Static Standee with generous center breathing room.
+    Generate 300 DPI Dual Direct Static Standee with reduced bottom gap and enlarged address/phone box.
     """
     w, h = 1200, 1800
     canvas = bg_img.copy()
@@ -574,11 +582,11 @@ def build_dual_direct_standee(config, bg_img, output_filename="standee_dual_dire
 
     cta_text = "SCAN TO CONNECT DIRECTLY"
     bbox = draw.textbbox((0, 0), cta_text, font=font_cta)
-    draw.text(((w - (bbox[2] - bbox[0])) / 2, 502), cta_text, fill=(255, 255, 255), font=font_cta)
+    draw.text(((w - (bbox[2] - bbox[0])) / 2, 498), cta_text, fill=(255, 255, 255), font=font_cta)
 
     sub_cta = "Point Your Camera Directly At Either QR Below  •  Instant Open"
     bbox = draw.textbbox((0, 0), sub_cta, font=font_sub_cta)
-    draw.text(((w - (bbox[2] - bbox[0])) / 2, 560), sub_cta, fill=(247, 223, 148), font=font_sub_cta)
+    draw.text(((w - (bbox[2] - bbox[0])) / 2, 556), sub_cta, fill=(247, 223, 148), font=font_sub_cta)
 
     google_url = config.get("googleReviewUrl", "https://www.google.com/gasearch?q=mudoven%20reviews&source=sh/x/gs/m2/5#ebo=3")
     insta_url = config.get("instagramUrl", "https://www.instagram.com/mudoven_indore?stkn=MTl0c2Q4eWVueXkwNg==")
@@ -589,7 +597,7 @@ def build_dual_direct_standee(config, bg_img, output_filename="standee_dual_dire
     card_w, card_h = 475, 585
     left_x = 100
     right_x = w - 100 - card_w
-    cards_y = 634
+    cards_y = 626
 
     # Left Card: Rate Us on Google
     draw.rounded_rectangle([left_x, cards_y, left_x + card_w, cards_y + card_h], radius=24, fill=(255, 255, 255), outline=(212, 175, 55), width=4)
@@ -611,8 +619,8 @@ def build_dual_direct_standee(config, bg_img, output_filename="standee_dual_dire
     draw.text((right_x + (card_w - (bbox[2] - bbox[0])) / 2, cards_y + 522), i_foot, fill=(12, 18, 32), font=font_card_sub)
 
     # Luxury Hospitality Highlights Strip
-    feat_x1, feat_y1 = 115, 1276
-    feat_x2, feat_y2 = w - 115, 1468
+    feat_x1, feat_y1 = 90, 1254
+    feat_x2, feat_y2 = w - 90, 1446
     glass = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     gdraw = ImageDraw.Draw(glass)
     gdraw.rounded_rectangle([feat_x1, feat_y1, feat_x2, feat_y2], radius=16, fill=(9, 13, 24, 225), outline=(212, 175, 55, 255), width=2)
@@ -642,7 +650,7 @@ def build_dual_direct_standee(config, bg_img, output_filename="standee_dual_dire
 
 def build_single_direct_standee(config, bg_img, url, mode="google", output_filename="standee_google_direct.png"):
     """
-    Generate 300 DPI Single Direct Standee with generous center breathing room.
+    Generate 300 DPI Single Direct Standee with reduced gap below QR code and enlarged address/phone box.
     """
     w, h = 1200, 1800
     canvas = bg_img.copy()
@@ -661,13 +669,13 @@ def build_single_direct_standee(config, bg_img, url, mode="google", output_filen
         pill_label = "Follow Us on Instagram  •  @mudoven_indore"
 
     bbox = draw.textbbox((0, 0), cta_text, font=font_cta)
-    draw.text(((w - (bbox[2] - bbox[0])) / 2, 505), cta_text, fill=(255, 255, 255), font=font_cta)
+    draw.text(((w - (bbox[2] - bbox[0])) / 2, 512), cta_text, fill=(255, 255, 255), font=font_cta)
 
     bbox_p = draw.textbbox((0, 0), pill_label, font=font_pill)
     pill_w = (bbox_p[2] - bbox_p[0]) + 96
     pill_h = 54
     px1 = int((w - pill_w) / 2)
-    py1 = 582
+    py1 = 588
     draw.rounded_rectangle([px1, py1, px1 + pill_w, py1 + pill_h], radius=27, fill=(12, 18, 32), outline=(212, 175, 55), width=2)
     if mode == "google":
         draw_google_g_icon(draw, px1 + 38, py1 + pill_h // 2, radius=14)
@@ -676,11 +684,11 @@ def build_single_direct_standee(config, bg_img, url, mode="google", output_filen
     draw.text((px1 + 70, py1 + 13), pill_label, fill=(255, 255, 255), font=font_pill)
 
     qr_img = generate_styled_qr(url, box_size=18, border=2, fill_color=(10, 14, 24))
-    card_size = 730
-    qr_size = 650
+    card_size = 752
+    qr_size = 672
     qr_img = qr_img.resize((qr_size, qr_size), Image.Resampling.LANCZOS)
     card_x = int((w - card_size) / 2)
-    card_y = 695
+    card_y = 690
 
     draw.rounded_rectangle(
         [card_x, card_y, card_x + card_size, card_y + card_size],
@@ -753,14 +761,14 @@ def build_mobile_landing_preview(bg_img, output_filename="mobile_landing_preview
     bbox = draw.textbbox((0, 0), sec_label, font=font_sec)
     sw = bbox[2] - bbox[0]
     sx = (w - sw) / 2
-    draw.text((sx, 1045), sec_label, fill=(247, 223, 148), font=font_sec)
-    draw_sparkle(draw, sx - 24, 1058, radius=9, color=(247, 223, 148))
-    draw_sparkle(draw, sx + sw + 24, 1058, radius=9, color=(247, 223, 148))
+    draw.text((sx, 1040), sec_label, fill=(247, 223, 148), font=font_sec)
+    draw_sparkle(draw, sx - 24, 1053, radius=9, color=(247, 223, 148))
+    draw_sparkle(draw, sx + sw + 24, 1053, radius=9, color=(247, 223, 148))
 
-    thumb_w, thumb_h = 302, 360
+    thumb_w, thumb_h = 302, 350
     thumb_gap = 32
     t_start_x = int((w - (thumb_w * 3 + thumb_gap * 2)) / 2)
-    t_y = 1102
+    t_y = 1094
     for idx, fn in enumerate(["ambience_1.jpg", "ambience_2.jpg", "ambience_3.jpg"]):
         tx = t_start_x + idx * (thumb_w + thumb_gap)
         if os.path.exists(fn):

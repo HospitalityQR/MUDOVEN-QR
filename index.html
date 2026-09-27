@@ -423,26 +423,28 @@
             display: block;
         }
 
-        /* 4. Bottom Address & Phone Box */
+        /* 4. Bottom Address & Phone Box (Enlarged 15% for High Readability) */
         .info-box {
             width: 100%;
-            background: rgba(9, 13, 24, 0.9);
+            background: rgba(9, 13, 24, 0.92);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
-            border: 1.5px solid var(--gold-primary);
-            border-radius: 14px;
-            padding: 12px 14px;
+            border: 2px solid var(--gold-primary);
+            border-radius: 15px;
+            padding: 14px 16px;
             margin-bottom: 12px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 7px;
+            gap: 8px;
             position: relative;
             z-index: 2;
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.5);
         }
 
         .address-line {
-            font-size: 11.5px;
+            font-size: 12.8px;
+            font-weight: 600;
             color: var(--text-cream);
             line-height: 1.4;
         }
@@ -451,16 +453,16 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 7px;
+            gap: 8px;
             color: var(--gold-light);
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 800;
             text-decoration: none;
-            letter-spacing: 0.4px;
-            padding: 5px 14px;
-            border-radius: 10px;
-            background: rgba(212, 175, 55, 0.16);
-            border: 1px solid rgba(212, 175, 55, 0.48);
+            letter-spacing: 0.5px;
+            padding: 7px 18px;
+            border-radius: 11px;
+            background: rgba(212, 175, 55, 0.18);
+            border: 1.5px solid rgba(212, 175, 55, 0.58);
             transition: all 0.2s ease;
         }
 
