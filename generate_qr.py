@@ -84,10 +84,10 @@ def prepare_brand_assets():
         c1 = ImageEnhance.Color(ImageEnhance.Contrast(c1).enhance(1.12)).enhance(1.15)
         c1.save("ambience_1.jpg", quality=94)
 
-        # ambience_2.jpg: Golden geometric atrium ('PIZZA TODAY SALAD TOMORROW' & 'MUDOVEN' neon)
-        c2 = ext.crop((int(ew * 0.10), int(eh * 0.22), int(ew * 0.92), int(eh * 0.56)))
-        c2 = ImageEnhance.Color(ImageEnhance.Contrast(c2).enhance(1.15)).enhance(1.18)
-        c2.save("ambience_2.jpg", quality=94)
+        # ambience_2.jpg: Focused & centered directly on the top 'MUDOVEN' glowing neon sign + golden atrium below it
+        c2 = ext.crop((int(ew * 0.45), int(eh * 0.21), int(ew * 0.96), int(eh * 0.56)))
+        c2 = ImageEnhance.Color(ImageEnhance.Contrast(c2).enhance(1.16)).enhance(1.20)
+        c2.save("ambience_2.jpg", quality=95)
 
         # ambience_3.jpg: Grand Entrance ('Mudoven' neon script, 'मड ओवन' wall & warm cove palms)
         c3 = ext.crop((int(ew * 0.04), int(eh * 0.44), int(ew * 0.96), int(eh * 0.78)))
@@ -185,11 +185,7 @@ def prepare_brand_assets():
         fg_img = Image.fromarray(out_rgba, "RGBA")
 
         # Add soft dark + warm gold drop shadow for maximum legibility over architectural photo
-        shadow = Image.new("RGBA", fg_img.size, (0, 0, 0, 0))
         s_arr = np.zeros_like(out_rgba)
-        s_arr[:, :, 0] = 0
-        s_arr[:, :, 1] = 0
-        s_arr[:, :, 2] = 0
         s_arr[:, :, 3] = (alpha * 210).astype(np.uint8)
         shadow_img = Image.fromarray(s_arr, "RGBA").filter(ImageFilter.GaussianBlur(radius=6))
 
@@ -203,21 +199,16 @@ def prepare_brand_assets():
 def create_ambience_luxury_background(width=1200, height=1800):
     """
     Create an Ultra-Luxury Mudoven Ambience Background directly from the user's attached
-    Mudoven night exterior photo (source_exterior.jpg):
-    - Preserves the iconic night sky, glowing golden 'PIZZA TODAY SALAD TOMORROW' atrium,
-      neon 'MUDOVEN' sign, and warm-lit courtyard from the attached photo
-    - Applies luxury Midnight Obsidian, Warm Atrium Gold & Sunset Flame-Orange atmospheric grading
-      so the attached photo is unmistakably the background while keeping all text & cards crystal-clear.
+    Mudoven night exterior photo (source_exterior.jpg).
     """
     y_idx = np.linspace(0, 1, height)[:, None]
     x_idx = np.linspace(0, 1, width)[None, :]
 
-    # Base luxury dark midnight-obsidian to warm amber-charcoal gradient
     r_base = (8 * (1 - y_idx) + 6 * y_idx)
     g_base = (12 * (1 - y_idx) + 9 * y_idx)
     b_base = (24 * (1 - y_idx) + 16 * y_idx)
 
-    dist_top = np.sqrt(((x_idx - 0.5) / 0.52) ** 2 + ((y_idx - 0.18) / 0.24) ** 2)
+    dist_top = np.sqrt(((x_idx - 0.5) / 0.52) ** 2 + ((y_idx - 0.16) / 0.22) ** 2)
     glow_top = np.clip(1.0 - dist_top, 0, 1) ** 1.8
 
     dist_mid = np.sqrt(((x_idx - 0.5) / 0.58) ** 2 + ((y_idx - 0.45) / 0.30) ** 2)
@@ -253,18 +244,15 @@ def create_ambience_luxury_background(width=1200, height=1800):
                 amb = amb.crop((0, top, aw, top + new_h))
             amb = amb.resize((width, height), Image.Resampling.LANCZOS)
 
-            # Keep architectural details recognizable with a soft luxury depth-of-field blur
             amb_sharp = ImageEnhance.Contrast(amb).enhance(1.18)
             amb_sharp = ImageEnhance.Color(amb_sharp).enhance(1.22)
-            amb_soft = amb_sharp.filter(ImageFilter.GaussianBlur(radius=3.2))
+            amb_soft = amb_sharp.filter(ImageFilter.GaussianBlur(radius=2.6))
 
             amb_arr = np.array(amb_soft, dtype=np.float32)
             base_arr = np.array(base_img, dtype=np.float32)
 
-            # Make the Mudoven building in the center/upper-middle clearly visible (45-58% blend)
-            # while darkening the top header and bottom footer zones for crisp luxury typography
             edge_dist = np.sqrt(((x_idx - 0.5) / 0.68) ** 2 + ((y_idx - 0.44) / 0.52) ** 2)
-            photo_weight = np.clip(0.56 - 0.30 * (edge_dist ** 1.5), 0.22, 0.56)[:, :, None]
+            photo_weight = np.clip(0.58 - 0.30 * (edge_dist ** 1.5), 0.22, 0.58)[:, :, None]
 
             blended = base_arr * (1.0 - photo_weight) + amb_arr * photo_weight
             base_img = Image.fromarray(np.clip(blended, 0, 255).astype(np.uint8), "RGB")
@@ -274,8 +262,8 @@ def create_ambience_luxury_background(width=1200, height=1800):
     overlay = Image.new("RGBA", (width, height), (0, 0, 0, 0))
     odraw = ImageDraw.Draw(overlay)
 
-    cx, cy = width // 2, 210
-    for r_arch, alpha_val in [(260, 28), (340, 22), (430, 15), (530, 10)]:
+    cx, cy = width // 2, 185
+    for r_arch, alpha_val in [(230, 26), (305, 20), (390, 14), (480, 10)]:
         odraw.ellipse(
             [cx - r_arch, cy - int(r_arch * 0.75), cx + r_arch, cy + int(r_arch * 0.75)],
             outline=(247, 223, 148, alpha_val),
@@ -284,10 +272,10 @@ def create_ambience_luxury_background(width=1200, height=1800):
 
     for angle_deg in range(0, 360, 15):
         rad = math.radians(angle_deg)
-        x1 = cx + int(125 * math.cos(rad))
-        y1 = 155 + int(125 * math.sin(rad))
-        x2 = cx + int(220 * math.cos(rad))
-        y2 = 155 + int(220 * math.sin(rad))
+        x1 = cx + int(110 * math.cos(rad))
+        y1 = 135 + int(110 * math.sin(rad))
+        x2 = cx + int(195 * math.cos(rad))
+        y2 = 135 + int(195 * math.sin(rad))
         odraw.line([x1, y1, x2, y2], fill=(212, 175, 55, 18), width=1)
 
     base_rgba = base_img.convert("RGBA")
@@ -397,44 +385,44 @@ def generate_styled_qr(url, box_size=16, border=2, fill_color=(12, 16, 28), back
 
 def draw_brand_header(canvas, draw, w=1200):
     """
-    Draw the Mudoven Cafe Luxury Header:
-    1. 24k Gold Rim Circular M Cafe / MudOven Cafe Medallion
+    Draw the Compact & Balanced Mudoven Cafe Luxury Header (Leaves Generous Center Breathing Room):
+    1. 24k Gold Rim Circular M Cafe / MudOven Cafe Medallion (158px)
     2. Official 'Mudoven' Script Wordmark ('Your Forever Happy Place • Est. 2012')
     3. 'M U D O V E N   C A F E   •   E S T .   2 0 1 2' in 24k Brushed Gold
     4. 'YOUR FOREVER HAPPY PLACE  •  WE SPEAK THE GOOD FOOD LANGUAGE' in crisp white
-    5. Ornamental 24k Gold Divider with Central Diamond
+    5. Ornamental 24k Gold Divider with Central Diamond at y=448 (freeing ~100px for center section!)
     """
     logo_path = "logo_with_gold_rim.png" if os.path.exists("logo_with_gold_rim.png") else "logo.png"
     if os.path.exists(logo_path):
         logo = Image.open(logo_path).convert("RGBA")
-        logo_size = 192
+        logo_size = 158
         logo = logo.resize((logo_size, logo_size), Image.Resampling.LANCZOS)
-        canvas.paste(logo, (int((w - logo_size) / 2), 54), mask=logo)
+        canvas.paste(logo, (int((w - logo_size) / 2), 46), mask=logo)
 
     title_path = "mudoven_title.png"
     if os.path.exists(title_path):
         title_img = Image.open(title_path).convert("RGBA")
-        target_w = 500
+        target_w = 370
         target_h = int(title_img.size[1] * (target_w / title_img.size[0]))
-        if target_h > 192:
-            target_h = 192
+        if target_h > 142:
+            target_h = 142
             target_w = int(title_img.size[0] * (target_h / title_img.size[1]))
         title_img = title_img.resize((target_w, target_h), Image.Resampling.LANCZOS)
-        hx = int((w - target_w) / 2) + 14
-        hy = 246 + (192 - target_h) // 2
+        hx = int((w - target_w) / 2) + 10
+        hy = 202
         canvas.paste(title_img, (hx, hy), mask=title_img)
 
-    font_midway = get_font(33, bold=True)
+    font_midway = get_font(28, bold=True)
     midway_text = "M U D O V E N   C A F E   •   E S T .   2 0 1 2"
     bbox = draw.textbbox((0, 0), midway_text, font=font_midway)
-    draw.text(((w - (bbox[2] - bbox[0])) / 2, 448), midway_text, fill=(247, 223, 148), font=font_midway)
+    draw.text(((w - (bbox[2] - bbox[0])) / 2, 354), midway_text, fill=(247, 223, 148), font=font_midway)
 
-    font_sub = get_font(21, bold=True)
+    font_sub = get_font(18, bold=True)
     sub_text = "YOUR FOREVER HAPPY PLACE  •  WE SPEAK THE GOOD FOOD LANGUAGE"
     bbox = draw.textbbox((0, 0), sub_text, font=font_sub)
-    draw.text(((w - (bbox[2] - bbox[0])) / 2, 498), sub_text, fill=(255, 255, 255), font=font_sub)
+    draw.text(((w - (bbox[2] - bbox[0])) / 2, 396), sub_text, fill=(255, 255, 255), font=font_sub)
 
-    div_y = 544
+    div_y = 438
     draw.line([200, div_y, w - 200, div_y], fill=(212, 175, 55), width=2)
     draw.polygon([(w // 2, div_y - 7), (w // 2 + 7, div_y), (w // 2, div_y + 7), (w // 2 - 7, div_y)], fill=(247, 223, 148))
 
@@ -485,10 +473,7 @@ def draw_footer(canvas, draw, w=1200):
 
 def build_hub_standee(config, bg_img, output_filenames=["table_standee_printable.png", "standee_front_printable.png"]):
     """
-    Generate the 300 DPI Primary Table Standee with:
-    - Mudoven 24k Gold Rim Medallion + Official 'Mudoven' Script Wordmark
-    - 'Rate Us on Google' and 'Follow Us on Instagram' pill badges
-    - Mudoven Night Facade & Warm Golden Atrium Ambience background
+    Generate the 300 DPI Primary Table Standee with generous center breathing room.
     """
     w, h = 1200, 1800
     canvas = bg_img.copy()
@@ -501,7 +486,7 @@ def build_hub_standee(config, bg_img, output_filenames=["table_standee_printable
 
     cta_text = "SCAN TO CONNECT"
     bbox = draw.textbbox((0, 0), cta_text, font=font_cta)
-    draw.text(((w - (bbox[2] - bbox[0])) / 2, 570), cta_text, fill=(255, 255, 255), font=font_cta)
+    draw.text(((w - (bbox[2] - bbox[0])) / 2, 505), cta_text, fill=(255, 255, 255), font=font_cta)
 
     # Two Pill Badges: [G Rate Us on Google] and [Follow Us on Instagram]
     label_g = "Rate Us on Google"
@@ -509,7 +494,7 @@ def build_hub_standee(config, bg_img, output_filenames=["table_standee_printable
     bbox_g = draw.textbbox((0, 0), label_g, font=font_pill)
     bbox_i = draw.textbbox((0, 0), label_i, font=font_pill)
 
-    pill_y = 642
+    pill_y = 582
     pill_h = 54
     pill_w_g = (bbox_g[2] - bbox_g[0]) + 84
     pill_w_i = (bbox_i[2] - bbox_i[0]) + 84
@@ -534,12 +519,12 @@ def build_hub_standee(config, bg_img, output_filenames=["table_standee_printable
     qr_url = config.get("landingPageUrl", "https://hospitalityqr.github.io/MUDOVEN-QR/?v=1")
     qr_img = generate_styled_qr(qr_url, box_size=18, border=2, fill_color=(10, 14, 24))
 
-    card_size = 720
-    qr_size = 640
+    card_size = 730
+    qr_size = 650
     qr_img = qr_img.resize((qr_size, qr_size), Image.Resampling.LANCZOS)
 
     card_x = int((w - card_size) / 2)
-    card_y = 735
+    card_y = 695
 
     shadow_layer = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     sdraw = ImageDraw.Draw(shadow_layer)
@@ -571,8 +556,7 @@ def build_hub_standee(config, bg_img, output_filenames=["table_standee_printable
 
 def build_dual_direct_standee(config, bg_img, output_filename="standee_dual_direct_static.png"):
     """
-    Generate 300 DPI Dual Direct Static Standee (Left QR -> Rate Us on Google, Right QR -> Follow Us on Instagram)
-    with Mudoven branding and Night Facade & Golden Atrium Ambience.
+    Generate 300 DPI Dual Direct Static Standee with generous center breathing room.
     """
     w, h = 1200, 1800
     canvas = bg_img.copy()
@@ -590,11 +574,11 @@ def build_dual_direct_standee(config, bg_img, output_filename="standee_dual_dire
 
     cta_text = "SCAN TO CONNECT DIRECTLY"
     bbox = draw.textbbox((0, 0), cta_text, font=font_cta)
-    draw.text(((w - (bbox[2] - bbox[0])) / 2, 568), cta_text, fill=(255, 255, 255), font=font_cta)
+    draw.text(((w - (bbox[2] - bbox[0])) / 2, 502), cta_text, fill=(255, 255, 255), font=font_cta)
 
     sub_cta = "Point Your Camera Directly At Either QR Below  •  Instant Open"
     bbox = draw.textbbox((0, 0), sub_cta, font=font_sub_cta)
-    draw.text(((w - (bbox[2] - bbox[0])) / 2, 624), sub_cta, fill=(247, 223, 148), font=font_sub_cta)
+    draw.text(((w - (bbox[2] - bbox[0])) / 2, 560), sub_cta, fill=(247, 223, 148), font=font_sub_cta)
 
     google_url = config.get("googleReviewUrl", "https://www.google.com/gasearch?q=mudoven%20reviews&source=sh/x/gs/m2/5#ebo=3")
     insta_url = config.get("instagramUrl", "https://www.instagram.com/mudoven_indore?stkn=MTl0c2Q4eWVueXkwNg==")
@@ -605,7 +589,7 @@ def build_dual_direct_standee(config, bg_img, output_filename="standee_dual_dire
     card_w, card_h = 475, 585
     left_x = 100
     right_x = w - 100 - card_w
-    cards_y = 678
+    cards_y = 634
 
     # Left Card: Rate Us on Google
     draw.rounded_rectangle([left_x, cards_y, left_x + card_w, cards_y + card_h], radius=24, fill=(255, 255, 255), outline=(212, 175, 55), width=4)
@@ -627,8 +611,8 @@ def build_dual_direct_standee(config, bg_img, output_filename="standee_dual_dire
     draw.text((right_x + (card_w - (bbox[2] - bbox[0])) / 2, cards_y + 522), i_foot, fill=(12, 18, 32), font=font_card_sub)
 
     # Luxury Hospitality Highlights Strip
-    feat_x1, feat_y1 = 115, 1300
-    feat_x2, feat_y2 = w - 115, 1488
+    feat_x1, feat_y1 = 115, 1276
+    feat_x2, feat_y2 = w - 115, 1468
     glass = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     gdraw = ImageDraw.Draw(glass)
     gdraw.rounded_rectangle([feat_x1, feat_y1, feat_x2, feat_y2], radius=16, fill=(9, 13, 24, 225), outline=(212, 175, 55, 255), width=2)
@@ -658,8 +642,7 @@ def build_dual_direct_standee(config, bg_img, output_filename="standee_dual_dire
 
 def build_single_direct_standee(config, bg_img, url, mode="google", output_filename="standee_google_direct.png"):
     """
-    Generate 300 DPI Single Direct Standee (Rate Us on Google Direct OR Follow Us on Instagram Direct)
-    with Mudoven branding and Night Facade & Golden Atrium Ambience.
+    Generate 300 DPI Single Direct Standee with generous center breathing room.
     """
     w, h = 1200, 1800
     canvas = bg_img.copy()
@@ -678,13 +661,13 @@ def build_single_direct_standee(config, bg_img, url, mode="google", output_filen
         pill_label = "Follow Us on Instagram  •  @mudoven_indore"
 
     bbox = draw.textbbox((0, 0), cta_text, font=font_cta)
-    draw.text(((w - (bbox[2] - bbox[0])) / 2, 570), cta_text, fill=(255, 255, 255), font=font_cta)
+    draw.text(((w - (bbox[2] - bbox[0])) / 2, 505), cta_text, fill=(255, 255, 255), font=font_cta)
 
     bbox_p = draw.textbbox((0, 0), pill_label, font=font_pill)
     pill_w = (bbox_p[2] - bbox_p[0]) + 96
     pill_h = 54
     px1 = int((w - pill_w) / 2)
-    py1 = 642
+    py1 = 582
     draw.rounded_rectangle([px1, py1, px1 + pill_w, py1 + pill_h], radius=27, fill=(12, 18, 32), outline=(212, 175, 55), width=2)
     if mode == "google":
         draw_google_g_icon(draw, px1 + 38, py1 + pill_h // 2, radius=14)
@@ -693,11 +676,11 @@ def build_single_direct_standee(config, bg_img, url, mode="google", output_filen
     draw.text((px1 + 70, py1 + 13), pill_label, fill=(255, 255, 255), font=font_pill)
 
     qr_img = generate_styled_qr(url, box_size=18, border=2, fill_color=(10, 14, 24))
-    card_size = 720
-    qr_size = 640
+    card_size = 730
+    qr_size = 650
     qr_img = qr_img.resize((qr_size, qr_size), Image.Resampling.LANCZOS)
     card_x = int((w - card_size) / 2)
-    card_y = 735
+    card_y = 695
 
     draw.rounded_rectangle(
         [card_x, card_y, card_x + card_size, card_y + card_size],
@@ -715,11 +698,10 @@ def build_single_direct_standee(config, bg_img, url, mode="google", output_filen
 
 def build_mobile_landing_preview(bg_img, output_filename="mobile_landing_preview.png"):
     """
-    Generate a visual preview of the Mobile QR Landing Page (index.html) showing:
-    - Mudoven Night Facade & Warm Golden Atrium Ambience background
-    - Circular 24k Gold Rim M Cafe Logo + Official 'Mudoven' Script Wordmark
+    Generate a visual preview of the Mobile QR Landing Page (index.html) with:
+    - Compact Brand Header & Generous Center Breathing Space
     - 'Rate Us on Google' and 'Follow Us on Instagram' interactive cards
-    - Ambience gallery strip + Address & Call button
+    - Ambience gallery strip where the 2nd photo clearly showcases the top 'MUDOVEN' neon sign
     """
     w, h = 1200, 1800
     canvas = bg_img.copy()
@@ -734,33 +716,33 @@ def build_mobile_landing_preview(bg_img, output_filename="mobile_landing_preview
 
     glass = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     gdraw = ImageDraw.Draw(glass)
-    c1_y1, c1_y2 = 590, 795
-    c2_y1, c2_y2 = 825, 1030
+    c1_y1, c1_y2 = 512, 722
+    c2_y1, c2_y2 = 762, 972
     gdraw.rounded_rectangle([115, c1_y1, w - 115, c1_y2], radius=24, fill=(18, 22, 34, 236), outline=(247, 223, 148, 255), width=3)
     gdraw.rounded_rectangle([115, c2_y1, w - 115, c2_y2], radius=24, fill=(10, 15, 26, 232), outline=(212, 175, 55, 230), width=2)
     canvas.paste(Image.alpha_composite(canvas.convert("RGBA"), glass).convert("RGB"))
     draw = ImageDraw.Draw(canvas)
 
     # Google Card Content
-    draw.rounded_rectangle([150, c1_y1 + 42, 265, c1_y1 + 157], radius=24, fill=(255, 255, 255), outline=(212, 175, 55), width=2)
-    draw_google_g_icon(draw, 207, c1_y1 + 100, radius=34)
-    draw.text((300, c1_y1 + 38), "Rate Us on Google", fill=(255, 255, 255), font=font_card_title)
-    draw.text((300, c1_y1 + 86), "Share your dining experience with us", fill=(203, 213, 225), font=font_card_desc)
-    draw_5_stars_row(draw, 310, c1_y1 + 142, star_radius=10, spacing=26, color=(251, 191, 36))
-    draw.text((445, c1_y1 + 130), "Tap to Review", fill=(247, 223, 148), font=font_card_tag)
-    ax1, ay1 = w - 183, c1_y1 + 102
+    draw.rounded_rectangle([150, c1_y1 + 45, 265, c1_y1 + 160], radius=24, fill=(255, 255, 255), outline=(212, 175, 55), width=2)
+    draw_google_g_icon(draw, 207, c1_y1 + 102, radius=34)
+    draw.text((300, c1_y1 + 40), "Rate Us on Google", fill=(255, 255, 255), font=font_card_title)
+    draw.text((300, c1_y1 + 88), "Share your dining experience with us", fill=(203, 213, 225), font=font_card_desc)
+    draw_5_stars_row(draw, 310, c1_y1 + 145, star_radius=10, spacing=26, color=(251, 191, 36))
+    draw.text((445, c1_y1 + 133), "Tap to Review", fill=(247, 223, 148), font=font_card_tag)
+    ax1, ay1 = w - 183, c1_y1 + 105
     draw.ellipse([ax1 - 32, ay1 - 32, ax1 + 32, ay1 + 32], fill=(212, 175, 55), outline=(247, 223, 148), width=2)
     draw.line([ax1 - 12, ay1, ax1 + 10, ay1], fill=(9, 13, 24), width=3)
     draw.line([ax1 + 2, ay1 - 9, ax1 + 11, ay1], fill=(9, 13, 24), width=3)
     draw.line([ax1 + 2, ay1 + 9, ax1 + 11, ay1], fill=(9, 13, 24), width=3)
 
     # Instagram Card Content
-    draw.rounded_rectangle([150, c2_y1 + 42, 265, c2_y1 + 157], radius=24, fill=(214, 41, 118), outline=(247, 223, 148), width=2)
-    draw_instagram_icon(draw, 207, c2_y1 + 100, size=64)
-    draw.text((300, c2_y1 + 38), "Follow Us on Instagram", fill=(255, 255, 255), font=font_card_title)
-    draw.text((300, c2_y1 + 86), "Explore wood-fired pizzas, reels & happy vibes", fill=(203, 213, 225), font=font_card_desc)
-    draw.text((300, c2_y1 + 130), "@mudoven_indore", fill=(247, 223, 148), font=font_card_tag)
-    ax2, ay2 = w - 183, c2_y1 + 102
+    draw.rounded_rectangle([150, c2_y1 + 45, 265, c2_y1 + 160], radius=24, fill=(214, 41, 118), outline=(247, 223, 148), width=2)
+    draw_instagram_icon(draw, 207, c2_y1 + 102, size=64)
+    draw.text((300, c2_y1 + 40), "Follow Us on Instagram", fill=(255, 255, 255), font=font_card_title)
+    draw.text((300, c2_y1 + 88), "Explore wood-fired pizzas, reels & happy vibes", fill=(203, 213, 225), font=font_card_desc)
+    draw.text((300, c2_y1 + 133), "@mudoven_indore", fill=(247, 223, 148), font=font_card_tag)
+    ax2, ay2 = w - 183, c2_y1 + 105
     draw.ellipse([ax2 - 32, ay2 - 32, ax2 + 32, ay2 + 32], fill=(16, 24, 42), outline=(212, 175, 55), width=2)
     draw.line([ax2 - 12, ay2, ax2 + 10, ay2], fill=(247, 223, 148), width=3)
     draw.line([ax2 + 2, ay2 - 9, ax2 + 11, ay2], fill=(247, 223, 148), width=3)
@@ -771,14 +753,14 @@ def build_mobile_landing_preview(bg_img, output_filename="mobile_landing_preview
     bbox = draw.textbbox((0, 0), sec_label, font=font_sec)
     sw = bbox[2] - bbox[0]
     sx = (w - sw) / 2
-    draw.text((sx, 1085), sec_label, fill=(247, 223, 148), font=font_sec)
-    draw_sparkle(draw, sx - 24, 1098, radius=9, color=(247, 223, 148))
-    draw_sparkle(draw, sx + sw + 24, 1098, radius=9, color=(247, 223, 148))
+    draw.text((sx, 1045), sec_label, fill=(247, 223, 148), font=font_sec)
+    draw_sparkle(draw, sx - 24, 1058, radius=9, color=(247, 223, 148))
+    draw_sparkle(draw, sx + sw + 24, 1058, radius=9, color=(247, 223, 148))
 
-    thumb_w, thumb_h = 302, 335
+    thumb_w, thumb_h = 302, 360
     thumb_gap = 32
     t_start_x = int((w - (thumb_w * 3 + thumb_gap * 2)) / 2)
-    t_y = 1138
+    t_y = 1102
     for idx, fn in enumerate(["ambience_1.jpg", "ambience_2.jpg", "ambience_3.jpg"]):
         tx = t_start_x + idx * (thumb_w + thumb_gap)
         if os.path.exists(fn):
@@ -788,10 +770,17 @@ def build_mobile_landing_preview(bg_img, output_filename="mobile_landing_preview
             t_r = thumb_w / thumb_h
             if s_r > t_r:
                 nw = int(ih * t_r)
-                im = im.crop(((iw - nw) // 2, 0, (iw - nw) // 2 + nw, ih))
+                # For ambience_2.jpg, bias horizontal crop toward right where 'MUDOVEN' neon sign sits
+                if idx == 1:
+                    left = max(0, min(iw - nw, int(iw * 0.60 - nw / 2)))
+                else:
+                    left = (iw - nw) // 2
+                im = im.crop((left, 0, left + nw, ih))
             else:
                 nh = int(iw / t_r)
-                im = im.crop((0, (ih - nh) // 2, iw, (ih - nh) // 2 + nh))
+                # Keep top aligned for ambience_2.jpg so top 'MUDOVEN' sign is 100% visible
+                top = 0 if idx == 1 else (ih - nh) // 2
+                im = im.crop((0, top, iw, top + nh))
             im = im.resize((thumb_w, thumb_h), Image.Resampling.LANCZOS)
             canvas.paste(im, (tx, t_y))
             draw.rounded_rectangle([tx, t_y, tx + thumb_w, t_y + thumb_h], radius=16, outline=(212, 175, 55), width=3)

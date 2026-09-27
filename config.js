@@ -8,13 +8,13 @@ window.RESTAURANT_CONFIG = {
     // 1. Brand Identity (Mudoven Cafe • Your Forever Happy Place • Est. 2012)
     name: "Mudoven",
     subname: "MUDOVEN CAFE • EST. 2012",
-    hindiTitleUrl: "mudoven_title.png?v=1",
+    hindiTitleUrl: "mudoven_title.png?v=2",
     tagline: "YOUR FOREVER HAPPY PLACE • WE SPEAK THE GOOD FOOD LANGUAGE",
     highlight: "Wood-Fired Pizzas • Handcrafted Coffee • Global Cafe & Dining",
     city: "Opp. Bharat Petrol Pump, AB Road, Pigdamber, Rau, Indore",
     phone: "8889177701",
     phoneDisplay: "88891 77701",
-    logoUrl: "logo_with_gold_rim.png?v=1",
+    logoUrl: "logo_with_gold_rim.png?v=2",
 
     // 2. Ambience Photos (Derived from Uploaded Mudoven Exterior Photo)
     ambiencePhotos: [
