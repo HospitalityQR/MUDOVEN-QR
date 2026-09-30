@@ -370,16 +370,150 @@ def draw_instagram_icon(draw, cx, cy, size=26):
 
 
 def generate_styled_qr(url, box_size=16, border=2, fill_color=(12, 16, 28), back_color=(255, 255, 255)):
-    """Generate a high-contrast, ultra-scannable QR code image."""
+    """
+    Generate a bespoke Mudoven Logo-Styled Luxury QR Code:
+    - ERROR_CORRECT_H (30% error recovery) for instant camera scanning
+    - Custom rounded QR modules in Deep Obsidian & Warm Mudoven Espresso-Orange tones
+    - Custom 3 Corner Finder Eyes styled in Mudoven Flame-Orange (#EA5408), 24k Gold & Obsidian
+    - Official Circular Mudoven 'M Cafe' Logo Medallion embedded in the center with a 24k Gold & Flame-Orange halo
+    """
     qr = qrcode.QRCode(
-        version=2,
+        version=4,
         error_correction=qrcode.constants.ERROR_CORRECT_H,
         box_size=box_size,
         border=border,
     )
     qr.add_data(url)
     qr.make(fit=True)
-    img = qr.make_image(fill_color=fill_color, back_color=back_color).convert("RGBA")
+
+    matrix = qr.get_matrix()
+    n = len(matrix)
+    b = border
+    active_n = n - 2 * b
+
+    cell = 24
+    img_size = n * cell
+    img = Image.new("RGBA", (img_size, img_size), (255, 255, 255, 255))
+    draw = ImageDraw.Draw(img)
+
+    # Center coordinates and circular logo safe-zone radius (in grid modules)
+    center_rc = (n - 1) / 2.0
+    logo_clear_r_modules = active_n * 0.145
+
+    def is_in_finder(r, c):
+        ar, ac = r - b, c - b
+        if 0 <= ar < 7 and 0 <= ac < 7:
+            return True
+        if 0 <= ar < 7 and (active_n - 7) <= ac < active_n:
+            return True
+        if (active_n - 7) <= ar < active_n and 0 <= ac < 7:
+            return True
+        return False
+
+    # 1. Draw rounded data modules outside finder eyes and center logo medallion
+    pad = 2
+    mod_radius = int(cell * 0.36)
+    for r in range(n):
+        for c in range(n):
+            if not matrix[r][c]:
+                continue
+            if is_in_finder(r, c):
+                continue
+            dist_center = math.hypot(r - center_rc, c - center_rc)
+            if dist_center < logo_clear_r_modules:
+                continue
+
+            x1 = c * cell + pad
+            y1 = r * cell + pad
+            x2 = (c + 1) * cell - pad
+            y2 = (r + 1) * cell - pad
+
+            # Subtle concentric Mudoven brand tint: deep warm flame-sienna ring around the center logo,
+            # deep obsidian-espresso elsewhere (all < 85 luminance for 100% instant camera contrast)
+            if dist_center < logo_clear_r_modules + 3.2:
+                mod_color = (182, 52, 6, 255)   # Deep Mudoven Flame-Orange
+            elif (r + c) % 5 == 0:
+                mod_color = (145, 42, 8, 255)   # Warm Roasted Espresso-Orange
+            else:
+                mod_color = (14, 18, 30, 255)   # Deep Mudoven Obsidian
+
+            draw.rounded_rectangle([x1, y1, x2, y2], radius=mod_radius, fill=mod_color)
+
+    # 2. Draw Custom Mudoven-Branded 3 Corner Finder Eyes (Flame-Orange + Obsidian + 24k Gold)
+    finder_origins = [
+        (b, b),
+        (b, b + active_n - 7),
+        (b + active_n - 7, b),
+    ]
+    for fr, fc in finder_origins:
+        fx1 = fc * cell
+        fy1 = fr * cell
+        fx2 = (fc + 7) * cell
+        fy2 = (fr + 7) * cell
+
+        # Outer 7x7 rounded square: Deep Obsidian with Mudoven Flame-Orange outer border
+        draw.rounded_rectangle(
+            [fx1, fy1, fx2, fy2],
+            radius=int(cell * 1.65),
+            fill=(14, 18, 30, 255),
+            outline=(234, 84, 8, 255),
+            width=4
+        )
+        # Inner 5x5 white rounded ring
+        draw.rounded_rectangle(
+            [fx1 + cell, fy1 + cell, fx2 - cell, fy2 - cell],
+            radius=int(cell * 1.15),
+            fill=(255, 255, 255, 255),
+            outline=(212, 175, 55, 190),
+            width=2
+        )
+        # Center 3x3 rounded core in signature Mudoven Flame-Orange (#EA5408) with dark inner accent
+        cx1 = fx1 + 2 * cell
+        cy1 = fy1 + 2 * cell
+        cx2 = fx2 - 2 * cell
+        cy2 = fy2 - 2 * cell
+        draw.rounded_rectangle(
+            [cx1, cy1, cx2, cy2],
+            radius=int(cell * 0.8),
+            fill=(224, 72, 8, 255),
+            outline=(14, 18, 30, 255),
+            width=3
+        )
+
+    # 3. Embed Circular Mudoven 'M Cafe' Logo Medallion in the Center
+    logo_path = "logo_with_gold_rim.png" if os.path.exists("logo_with_gold_rim.png") else "logo.png"
+    if os.path.exists(logo_path):
+        center_px = img_size // 2
+        logo_diam = int(img_size * 0.235)
+        halo_diam = logo_diam + 24
+        orange_ring_diam = logo_diam + 12
+
+        # Crisp white quiet halo behind center logo
+        draw.ellipse(
+            [
+                center_px - halo_diam // 2,
+                center_px - halo_diam // 2,
+                center_px + halo_diam // 2,
+                center_px + halo_diam // 2,
+            ],
+            fill=(255, 255, 255, 255),
+            outline=(212, 175, 55, 255),
+            width=3,
+        )
+        # Signature Mudoven Flame-Orange accent ring around the medallion
+        draw.ellipse(
+            [
+                center_px - orange_ring_diam // 2,
+                center_px - orange_ring_diam // 2,
+                center_px + orange_ring_diam // 2,
+                center_px + orange_ring_diam // 2,
+            ],
+            fill=(234, 84, 8, 255),
+        )
+
+        logo_img = Image.open(logo_path).convert("RGBA").resize((logo_diam, logo_diam), Image.Resampling.LANCZOS)
+        img.paste(logo_img, (center_px - logo_diam // 2, center_px - logo_diam // 2), mask=logo_img)
+
     return img
 
 
