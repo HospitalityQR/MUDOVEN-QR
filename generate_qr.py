@@ -429,50 +429,88 @@ def draw_brand_header(canvas, draw, w=1200):
 
 def draw_footer(canvas, draw, w=1200):
     """
-    Draw the Enlarged (15% larger) Bottom Address & Phone Box + Gold Sparkle Thank-You Footer
-    for effortless readability even on compact printed cards/sachets.
+    Draw the Ultra-Luxury Dual-Outlet Address & Phone Box (Vijay Nagar First, then Rau)
+    + Gold Sparkle Thank-You Footer for effortless readability on printed standees & cards.
     """
-    font_addr = get_font(25, bold=True)
+    font_label = get_font(22, bold=True)
+    font_addr = get_font(22, bold=True)
     font_phone = get_font(34, bold=True)
     font_thanks = get_font(28, bold=False, italic=True, serif=True)
 
-    info_x1, info_y1 = 90, 1488
-    info_x2, info_y2 = w - 90, 1656
+    info_x1, info_y1 = 82, 1450
+    info_x2, info_y2 = w - 82, 1662
 
     glass = Image.new("RGBA", (w, 1800), (0, 0, 0, 0))
     gdraw = ImageDraw.Draw(glass)
+    # Outer 24k Gold Box
     gdraw.rounded_rectangle(
         [info_x1, info_y1, info_x2, info_y2],
-        radius=16,
-        fill=(9, 13, 24, 238),
+        radius=18,
+        fill=(8, 12, 22, 242),
         outline=(212, 175, 55, 255),
         width=3
     )
-    # Subtle inner gold pill highlight behind phone number for extra print contrast
+    # Inner hairline gold border
     gdraw.rounded_rectangle(
-        [info_x1 + 140, info_y1 + 78, info_x2 - 140, info_y2 - 18],
-        radius=12,
-        fill=(212, 175, 55, 34),
-        outline=(247, 223, 148, 135),
+        [info_x1 + 6, info_y1 + 6, info_x2 - 6, info_y2 - 6],
+        radius=14,
+        outline=(247, 223, 148, 90),
+        width=1
+    )
+    # Subtle gold divider line between Vijay Nagar and Rau addresses
+    div_y = info_y1 + 62
+    gdraw.line([info_x1 + 90, div_y, info_x2 - 90, div_y], fill=(212, 175, 55, 115), width=1)
+
+    # Prominent 24k Gold Call Pill behind Phone Number
+    gdraw.rounded_rectangle(
+        [info_x1 + 135, info_y1 + 124, info_x2 - 135, info_y2 - 16],
+        radius=14,
+        fill=(212, 175, 55, 38),
+        outline=(249, 226, 156, 165),
         width=2
     )
     canvas_rgba = canvas.convert("RGBA")
     canvas_rgba = Image.alpha_composite(canvas_rgba, glass)
     canvas.paste(canvas_rgba.convert("RGB"))
 
-    addr_text = "Opp. Bharat Petrol Pump, AB Road, Pigdamber, Rau, Indore"
-    bbox = draw.textbbox((0, 0), addr_text, font=font_addr)
-    draw.text(((w - (bbox[2] - bbox[0])) / 2, info_y1 + 24), addr_text, fill=(250, 247, 240), font=font_addr)
+    # 1. FIRST ADDRESS: Vijay Nagar (The Hub, Scheme No. 78, Vijay Nagar)
+    lbl1 = "VIJAY NAGAR :  "
+    txt1 = "The Hub, Scheme No. 78, Vijay Nagar, Indore"
+    b_lbl1 = draw.textbbox((0, 0), lbl1, font=font_label)
+    b_txt1 = draw.textbbox((0, 0), txt1, font=font_addr)
+    w1_lbl = b_lbl1[2] - b_lbl1[0]
+    w1_txt = b_txt1[2] - b_txt1[0]
+    total_w1 = w1_lbl + w1_txt
+    x1_start = (w - total_w1) / 2
+    y1_row = info_y1 + 20
+    draw_sparkle(draw, x1_start - 20, y1_row + 12, radius=7, color=(249, 226, 156))
+    draw.text((x1_start, y1_row), lbl1, fill=(249, 226, 156), font=font_label)
+    draw.text((x1_start + w1_lbl, y1_row), txt1, fill=(255, 255, 255), font=font_addr)
 
-    phone_text = "Call / Reservation: 88891 77701"
+    # 2. SECOND ADDRESS: Rau (Opp. Bharat Petrol Pump, AB Road, Pigdamber, Rau, Indore)
+    lbl2 = "RAU :  "
+    txt2 = "Opp. Bharat Petrol Pump, AB Road, Pigdamber, Rau, Indore"
+    b_lbl2 = draw.textbbox((0, 0), lbl2, font=font_label)
+    b_txt2 = draw.textbbox((0, 0), txt2, font=font_addr)
+    w2_lbl = b_lbl2[2] - b_lbl2[0]
+    w2_txt = b_txt2[2] - b_txt2[0]
+    total_w2 = w2_lbl + w2_txt
+    x2_start = (w - total_w2) / 2
+    y2_row = info_y1 + 76
+    draw_sparkle(draw, x2_start - 20, y2_row + 12, radius=7, color=(249, 226, 156))
+    draw.text((x2_start, y2_row), lbl2, fill=(249, 226, 156), font=font_label)
+    draw.text((x2_start + w2_lbl, y2_row), txt2, fill=(250, 247, 240), font=font_addr)
+
+    # 3. MOBILE NUMBER: 88891 77705
+    phone_text = "Call / Reservation: 88891 77705"
     bbox = draw.textbbox((0, 0), phone_text, font=font_phone)
-    draw.text(((w - (bbox[2] - bbox[0])) / 2, info_y1 + 92), phone_text, fill=(249, 226, 148), font=font_phone)
+    draw.text(((w - (bbox[2] - bbox[0])) / 2, info_y1 + 139), phone_text, fill=(250, 228, 152), font=font_phone)
 
     thanks_text = "Thank you for dining with us!"
     bbox = draw.textbbox((0, 0), thanks_text, font=font_thanks)
     tw = bbox[2] - bbox[0]
     tx = (w - tw) / 2
-    ty = 1690
+    ty = 1692
     draw.text((tx, ty), thanks_text, fill=(247, 223, 148), font=font_thanks)
 
     draw_sparkle(draw, tx - 32, ty + 16, radius=11, color=(247, 223, 148))
@@ -481,7 +519,7 @@ def draw_footer(canvas, draw, w=1200):
 
 def build_hub_standee(config, bg_img, output_filenames=["table_standee_printable.png", "standee_front_printable.png"]):
     """
-    Generate the 300 DPI Primary Table Standee with reduced gap below QR code and enlarged address/phone box.
+    Generate the 300 DPI Primary Table Standee with reduced gap below QR code and ultra-luxury dual-outlet address box.
     """
     w, h = 1200, 1800
     canvas = bg_img.copy()
@@ -494,7 +532,7 @@ def build_hub_standee(config, bg_img, output_filenames=["table_standee_printable
 
     cta_text = "SCAN TO CONNECT"
     bbox = draw.textbbox((0, 0), cta_text, font=font_cta)
-    draw.text(((w - (bbox[2] - bbox[0])) / 2, 512), cta_text, fill=(255, 255, 255), font=font_cta)
+    draw.text(((w - (bbox[2] - bbox[0])) / 2, 492), cta_text, fill=(255, 255, 255), font=font_cta)
 
     # Two Pill Badges: [G Rate Us on Google] and [Follow Us on Instagram]
     label_g = "Rate Us on Google"
@@ -502,7 +540,7 @@ def build_hub_standee(config, bg_img, output_filenames=["table_standee_printable
     bbox_g = draw.textbbox((0, 0), label_g, font=font_pill)
     bbox_i = draw.textbbox((0, 0), label_i, font=font_pill)
 
-    pill_y = 588
+    pill_y = 564
     pill_h = 54
     pill_w_g = (bbox_g[2] - bbox_g[0]) + 84
     pill_w_i = (bbox_i[2] - bbox_i[0]) + 84
@@ -524,15 +562,15 @@ def build_hub_standee(config, bg_img, output_filenames=["table_standee_printable
     draw_instagram_icon(draw, ix1 + 34, iy1 + pill_h // 2, size=24)
     draw.text((ix1 + 60, iy1 + 14), label_i, fill=(255, 255, 255), font=font_pill)
 
-    qr_url = config.get("landingPageUrl", "https://hospitalityqr.github.io/MUDOVEN-QR/?v=1")
+    qr_url = config.get("landingPageUrl", "https://hospitalityqr.github.io/MUDOVEN-QR/?v=3")
     qr_img = generate_styled_qr(qr_url, box_size=18, border=2, fill_color=(10, 14, 24))
 
     card_size = 752
-    qr_size = 672
+    qr_size = 674
     qr_img = qr_img.resize((qr_size, qr_size), Image.Resampling.LANCZOS)
 
     card_x = int((w - card_size) / 2)
-    card_y = 690
+    card_y = 656
 
     shadow_layer = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     sdraw = ImageDraw.Draw(shadow_layer)
@@ -564,7 +602,7 @@ def build_hub_standee(config, bg_img, output_filenames=["table_standee_printable
 
 def build_dual_direct_standee(config, bg_img, output_filename="standee_dual_direct_static.png"):
     """
-    Generate 300 DPI Dual Direct Static Standee with reduced bottom gap and enlarged address/phone box.
+    Generate 300 DPI Dual Direct Static Standee with ultra-luxury dual-outlet address box.
     """
     w, h = 1200, 1800
     canvas = bg_img.copy()
@@ -578,49 +616,49 @@ def build_dual_direct_standee(config, bg_img, output_filename="standee_dual_dire
     font_card_head_i = get_font(21, bold=True)
     font_card_sub = get_font(20, bold=True)
     font_feature_title = get_font(23, bold=True)
-    font_feature_item = get_font(22, bold=False)
+    font_feature_item = get_font(21, bold=False)
 
     cta_text = "SCAN TO CONNECT DIRECTLY"
     bbox = draw.textbbox((0, 0), cta_text, font=font_cta)
-    draw.text(((w - (bbox[2] - bbox[0])) / 2, 498), cta_text, fill=(255, 255, 255), font=font_cta)
+    draw.text(((w - (bbox[2] - bbox[0])) / 2, 486), cta_text, fill=(255, 255, 255), font=font_cta)
 
     sub_cta = "Point Your Camera Directly At Either QR Below  •  Instant Open"
     bbox = draw.textbbox((0, 0), sub_cta, font=font_sub_cta)
-    draw.text(((w - (bbox[2] - bbox[0])) / 2, 556), sub_cta, fill=(247, 223, 148), font=font_sub_cta)
+    draw.text(((w - (bbox[2] - bbox[0])) / 2, 542), sub_cta, fill=(247, 223, 148), font=font_sub_cta)
 
     google_url = config.get("googleReviewUrl", "https://www.google.com/gasearch?q=mudoven%20reviews&source=sh/x/gs/m2/5#ebo=3")
     insta_url = config.get("instagramUrl", "https://www.instagram.com/mudoven_indore?stkn=MTl0c2Q4eWVueXkwNg==")
 
-    qr_g = generate_styled_qr(google_url, box_size=14, border=2, fill_color=(10, 14, 24)).resize((410, 410), Image.Resampling.LANCZOS)
-    qr_i = generate_styled_qr(insta_url, box_size=14, border=2, fill_color=(10, 14, 24)).resize((410, 410), Image.Resampling.LANCZOS)
+    qr_g = generate_styled_qr(google_url, box_size=14, border=2, fill_color=(10, 14, 24)).resize((404, 404), Image.Resampling.LANCZOS)
+    qr_i = generate_styled_qr(insta_url, box_size=14, border=2, fill_color=(10, 14, 24)).resize((404, 404), Image.Resampling.LANCZOS)
 
-    card_w, card_h = 475, 585
+    card_w, card_h = 475, 572
     left_x = 100
     right_x = w - 100 - card_w
-    cards_y = 626
+    cards_y = 604
 
     # Left Card: Rate Us on Google
     draw.rounded_rectangle([left_x, cards_y, left_x + card_w, cards_y + card_h], radius=24, fill=(255, 255, 255), outline=(212, 175, 55), width=4)
-    draw.rounded_rectangle([left_x + 22, cards_y + 20, left_x + card_w - 22, cards_y + 74], radius=27, fill=(12, 18, 32), outline=(212, 175, 55), width=2)
-    draw_google_g_icon(draw, left_x + 56, cards_y + 47, radius=13)
-    draw.text((left_x + 84, cards_y + 34), "Rate Us on Google", fill=(255, 255, 255), font=font_card_head_g)
-    canvas.paste(qr_g, (left_x + (card_w - 410) // 2, cards_y + 92))
-    draw_5_stars_row(draw, left_x + 76, cards_y + 533, star_radius=8, spacing=20, color=(218, 165, 32))
-    draw.text((left_x + 182, cards_y + 522), "RATE US ON GOOGLE", fill=(12, 18, 32), font=font_card_sub)
+    draw.rounded_rectangle([left_x + 22, cards_y + 18, left_x + card_w - 22, cards_y + 72], radius=27, fill=(12, 18, 32), outline=(212, 175, 55), width=2)
+    draw_google_g_icon(draw, left_x + 56, cards_y + 45, radius=13)
+    draw.text((left_x + 84, cards_y + 32), "Rate Us on Google", fill=(255, 255, 255), font=font_card_head_g)
+    canvas.paste(qr_g, (left_x + (card_w - 404) // 2, cards_y + 88))
+    draw_5_stars_row(draw, left_x + 76, cards_y + 522, star_radius=8, spacing=20, color=(218, 165, 32))
+    draw.text((left_x + 182, cards_y + 511), "RATE US ON GOOGLE", fill=(12, 18, 32), font=font_card_sub)
 
     # Right Card: Follow Us on Instagram
     draw.rounded_rectangle([right_x, cards_y, right_x + card_w, cards_y + card_h], radius=24, fill=(255, 255, 255), outline=(212, 175, 55), width=4)
-    draw.rounded_rectangle([right_x + 22, cards_y + 20, right_x + card_w - 22, cards_y + 74], radius=27, fill=(12, 18, 32), outline=(212, 175, 55), width=2)
-    draw_instagram_icon(draw, right_x + 54, cards_y + 47, size=24)
-    draw.text((right_x + 80, cards_y + 35), "Follow Us on Instagram", fill=(255, 255, 255), font=font_card_head_i)
-    canvas.paste(qr_i, (right_x + (card_w - 410) // 2, cards_y + 92))
+    draw.rounded_rectangle([right_x + 22, cards_y + 18, right_x + card_w - 22, cards_y + 72], radius=27, fill=(12, 18, 32), outline=(212, 175, 55), width=2)
+    draw_instagram_icon(draw, right_x + 54, cards_y + 45, size=24)
+    draw.text((right_x + 80, cards_y + 33), "Follow Us on Instagram", fill=(255, 255, 255), font=font_card_head_i)
+    canvas.paste(qr_i, (right_x + (card_w - 404) // 2, cards_y + 88))
     i_foot = "FOLLOW @MUDOVEN_INDORE"
     bbox = draw.textbbox((0, 0), i_foot, font=font_card_sub)
-    draw.text((right_x + (card_w - (bbox[2] - bbox[0])) / 2, cards_y + 522), i_foot, fill=(12, 18, 32), font=font_card_sub)
+    draw.text((right_x + (card_w - (bbox[2] - bbox[0])) / 2, cards_y + 511), i_foot, fill=(12, 18, 32), font=font_card_sub)
 
     # Luxury Hospitality Highlights Strip
-    feat_x1, feat_y1 = 90, 1254
-    feat_x2, feat_y2 = w - 90, 1446
+    feat_x1, feat_y1 = 82, 1218
+    feat_x2, feat_y2 = w - 82, 1412
     glass = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     gdraw = ImageDraw.Draw(glass)
     gdraw.rounded_rectangle([feat_x1, feat_y1, feat_x2, feat_y2], radius=16, fill=(9, 13, 24, 225), outline=(212, 175, 55, 255), width=2)
@@ -631,17 +669,17 @@ def build_dual_direct_standee(config, bg_img, output_filename="standee_dual_dire
     bbox = draw.textbbox((0, 0), ft_head, font=font_feature_title)
     ft_w = bbox[2] - bbox[0]
     ft_x = (w - ft_w) / 2
-    draw.text((ft_x, feat_y1 + 24), ft_head, fill=(247, 223, 148), font=font_feature_title)
-    draw_sparkle(draw, ft_x - 28, feat_y1 + 37, radius=10, color=(247, 223, 148))
-    draw_sparkle(draw, ft_x + ft_w + 28, feat_y1 + 37, radius=10, color=(247, 223, 148))
+    draw.text((ft_x, feat_y1 + 22), ft_head, fill=(247, 223, 148), font=font_feature_title)
+    draw_sparkle(draw, ft_x - 28, feat_y1 + 35, radius=10, color=(247, 223, 148))
+    draw_sparkle(draw, ft_x + ft_w + 28, feat_y1 + 35, radius=10, color=(247, 223, 148))
 
     ft_line1 = "Wood-Fired Pizzas  •  Artisanal Coffee  •  Global Cafe & Fine Dining"
     bbox = draw.textbbox((0, 0), ft_line1, font=font_feature_item)
-    draw.text(((w - (bbox[2] - bbox[0])) / 2, feat_y1 + 78), ft_line1, fill=(255, 255, 255), font=font_feature_item)
+    draw.text(((w - (bbox[2] - bbox[0])) / 2, feat_y1 + 74), ft_line1, fill=(255, 255, 255), font=font_feature_item)
 
     ft_line2 = "\"We Speak The Good Food Language\"  —  Your Forever Happy Place!"
     bbox = draw.textbbox((0, 0), ft_line2, font=font_feature_item)
-    draw.text(((w - (bbox[2] - bbox[0])) / 2, feat_y1 + 124), ft_line2, fill=(226, 232, 240), font=font_feature_item)
+    draw.text(((w - (bbox[2] - bbox[0])) / 2, feat_y1 + 120), ft_line2, fill=(226, 232, 240), font=font_feature_item)
 
     draw_footer(canvas, draw, w)
     canvas.save(output_filename, quality=95, dpi=(300, 300))
@@ -650,7 +688,7 @@ def build_dual_direct_standee(config, bg_img, output_filename="standee_dual_dire
 
 def build_single_direct_standee(config, bg_img, url, mode="google", output_filename="standee_google_direct.png"):
     """
-    Generate 300 DPI Single Direct Standee with reduced gap below QR code and enlarged address/phone box.
+    Generate 300 DPI Single Direct Standee with reduced gap below QR code and ultra-luxury dual-outlet address box.
     """
     w, h = 1200, 1800
     canvas = bg_img.copy()
@@ -669,13 +707,13 @@ def build_single_direct_standee(config, bg_img, url, mode="google", output_filen
         pill_label = "Follow Us on Instagram  •  @mudoven_indore"
 
     bbox = draw.textbbox((0, 0), cta_text, font=font_cta)
-    draw.text(((w - (bbox[2] - bbox[0])) / 2, 512), cta_text, fill=(255, 255, 255), font=font_cta)
+    draw.text(((w - (bbox[2] - bbox[0])) / 2, 492), cta_text, fill=(255, 255, 255), font=font_cta)
 
     bbox_p = draw.textbbox((0, 0), pill_label, font=font_pill)
     pill_w = (bbox_p[2] - bbox_p[0]) + 96
     pill_h = 54
     px1 = int((w - pill_w) / 2)
-    py1 = 588
+    py1 = 564
     draw.rounded_rectangle([px1, py1, px1 + pill_w, py1 + pill_h], radius=27, fill=(12, 18, 32), outline=(212, 175, 55), width=2)
     if mode == "google":
         draw_google_g_icon(draw, px1 + 38, py1 + pill_h // 2, radius=14)
@@ -685,10 +723,10 @@ def build_single_direct_standee(config, bg_img, url, mode="google", output_filen
 
     qr_img = generate_styled_qr(url, box_size=18, border=2, fill_color=(10, 14, 24))
     card_size = 752
-    qr_size = 672
+    qr_size = 674
     qr_img = qr_img.resize((qr_size, qr_size), Image.Resampling.LANCZOS)
     card_x = int((w - card_size) / 2)
-    card_y = 690
+    card_y = 656
 
     draw.rounded_rectangle(
         [card_x, card_y, card_x + card_size, card_y + card_size],
@@ -710,6 +748,7 @@ def build_mobile_landing_preview(bg_img, output_filename="mobile_landing_preview
     - Compact Brand Header & Generous Center Breathing Space
     - 'Rate Us on Google' and 'Follow Us on Instagram' interactive cards
     - Ambience gallery strip where the 2nd photo clearly showcases the top 'MUDOVEN' neon sign
+    - Ultra-Luxury Dual-Outlet Address Box (Vijay Nagar First, then Rau) + Mobile 88891 77705
     """
     w, h = 1200, 1800
     canvas = bg_img.copy()
@@ -724,33 +763,33 @@ def build_mobile_landing_preview(bg_img, output_filename="mobile_landing_preview
 
     glass = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     gdraw = ImageDraw.Draw(glass)
-    c1_y1, c1_y2 = 512, 722
-    c2_y1, c2_y2 = 762, 972
+    c1_y1, c1_y2 = 496, 702
+    c2_y1, c2_y2 = 738, 944
     gdraw.rounded_rectangle([115, c1_y1, w - 115, c1_y2], radius=24, fill=(18, 22, 34, 236), outline=(247, 223, 148, 255), width=3)
     gdraw.rounded_rectangle([115, c2_y1, w - 115, c2_y2], radius=24, fill=(10, 15, 26, 232), outline=(212, 175, 55, 230), width=2)
     canvas.paste(Image.alpha_composite(canvas.convert("RGBA"), glass).convert("RGB"))
     draw = ImageDraw.Draw(canvas)
 
     # Google Card Content
-    draw.rounded_rectangle([150, c1_y1 + 45, 265, c1_y1 + 160], radius=24, fill=(255, 255, 255), outline=(212, 175, 55), width=2)
-    draw_google_g_icon(draw, 207, c1_y1 + 102, radius=34)
-    draw.text((300, c1_y1 + 40), "Rate Us on Google", fill=(255, 255, 255), font=font_card_title)
-    draw.text((300, c1_y1 + 88), "Share your dining experience with us", fill=(203, 213, 225), font=font_card_desc)
-    draw_5_stars_row(draw, 310, c1_y1 + 145, star_radius=10, spacing=26, color=(251, 191, 36))
-    draw.text((445, c1_y1 + 133), "Tap to Review", fill=(247, 223, 148), font=font_card_tag)
-    ax1, ay1 = w - 183, c1_y1 + 105
+    draw.rounded_rectangle([150, c1_y1 + 44, 265, c1_y1 + 159], radius=24, fill=(255, 255, 255), outline=(212, 175, 55), width=2)
+    draw_google_g_icon(draw, 207, c1_y1 + 101, radius=34)
+    draw.text((300, c1_y1 + 38), "Rate Us on Google", fill=(255, 255, 255), font=font_card_title)
+    draw.text((300, c1_y1 + 86), "Share your dining experience with us", fill=(203, 213, 225), font=font_card_desc)
+    draw_5_stars_row(draw, 310, c1_y1 + 143, star_radius=10, spacing=26, color=(251, 191, 36))
+    draw.text((445, c1_y1 + 131), "Tap to Review", fill=(247, 223, 148), font=font_card_tag)
+    ax1, ay1 = w - 183, c1_y1 + 103
     draw.ellipse([ax1 - 32, ay1 - 32, ax1 + 32, ay1 + 32], fill=(212, 175, 55), outline=(247, 223, 148), width=2)
     draw.line([ax1 - 12, ay1, ax1 + 10, ay1], fill=(9, 13, 24), width=3)
     draw.line([ax1 + 2, ay1 - 9, ax1 + 11, ay1], fill=(9, 13, 24), width=3)
     draw.line([ax1 + 2, ay1 + 9, ax1 + 11, ay1], fill=(9, 13, 24), width=3)
 
     # Instagram Card Content
-    draw.rounded_rectangle([150, c2_y1 + 45, 265, c2_y1 + 160], radius=24, fill=(214, 41, 118), outline=(247, 223, 148), width=2)
-    draw_instagram_icon(draw, 207, c2_y1 + 102, size=64)
-    draw.text((300, c2_y1 + 40), "Follow Us on Instagram", fill=(255, 255, 255), font=font_card_title)
-    draw.text((300, c2_y1 + 88), "Explore wood-fired pizzas, reels & happy vibes", fill=(203, 213, 225), font=font_card_desc)
-    draw.text((300, c2_y1 + 133), "@mudoven_indore", fill=(247, 223, 148), font=font_card_tag)
-    ax2, ay2 = w - 183, c2_y1 + 105
+    draw.rounded_rectangle([150, c2_y1 + 44, 265, c2_y1 + 159], radius=24, fill=(214, 41, 118), outline=(247, 223, 148), width=2)
+    draw_instagram_icon(draw, 207, c2_y1 + 101, size=64)
+    draw.text((300, c2_y1 + 38), "Follow Us on Instagram", fill=(255, 255, 255), font=font_card_title)
+    draw.text((300, c2_y1 + 86), "Explore wood-fired pizzas, reels & happy vibes", fill=(203, 213, 225), font=font_card_desc)
+    draw.text((300, c2_y1 + 131), "@mudoven_indore", fill=(247, 223, 148), font=font_card_tag)
+    ax2, ay2 = w - 183, c2_y1 + 103
     draw.ellipse([ax2 - 32, ay2 - 32, ax2 + 32, ay2 + 32], fill=(16, 24, 42), outline=(212, 175, 55), width=2)
     draw.line([ax2 - 12, ay2, ax2 + 10, ay2], fill=(247, 223, 148), width=3)
     draw.line([ax2 + 2, ay2 - 9, ax2 + 11, ay2], fill=(247, 223, 148), width=3)
@@ -761,14 +800,14 @@ def build_mobile_landing_preview(bg_img, output_filename="mobile_landing_preview
     bbox = draw.textbbox((0, 0), sec_label, font=font_sec)
     sw = bbox[2] - bbox[0]
     sx = (w - sw) / 2
-    draw.text((sx, 1040), sec_label, fill=(247, 223, 148), font=font_sec)
-    draw_sparkle(draw, sx - 24, 1053, radius=9, color=(247, 223, 148))
-    draw_sparkle(draw, sx + sw + 24, 1053, radius=9, color=(247, 223, 148))
+    draw.text((sx, 1004), sec_label, fill=(247, 223, 148), font=font_sec)
+    draw_sparkle(draw, sx - 24, 1017, radius=9, color=(247, 223, 148))
+    draw_sparkle(draw, sx + sw + 24, 1017, radius=9, color=(247, 223, 148))
 
-    thumb_w, thumb_h = 302, 350
+    thumb_w, thumb_h = 302, 354
     thumb_gap = 32
     t_start_x = int((w - (thumb_w * 3 + thumb_gap * 2)) / 2)
-    t_y = 1094
+    t_y = 1054
     for idx, fn in enumerate(["ambience_1.jpg", "ambience_2.jpg", "ambience_3.jpg"]):
         tx = t_start_x + idx * (thumb_w + thumb_gap)
         if os.path.exists(fn):
