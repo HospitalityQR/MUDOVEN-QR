@@ -32,7 +32,7 @@ window.RESTAURANT_CONFIG = {
     ],
 
     // 3. Action Destination Links (Provided by User)
-    googleReviewUrl: "https://www.google.com/gasearch?q=mudoven%20vijaynagar&source=sh/x/gs/m2/5#sv=CAESzQEKuQEStgEKd0FKaVQ0dElURG5rN2lXWkg3clJQMFZnemZSU1Q1bTlNb1V4V3ExdjhUZHdZcjhkM0t3MHV4N2wtWlBLanh4U1AzSk5Ub0tibDNuNXNNVXhpSHNyRnJQLTlhZlAxbEZJQWh0VDAwRk1JY2RfeWI3UWNCTkdSR2tzEhdKQVMtYXNpV09iU05zZU1QeE1Uc3NRYxoiQURzcjlmVE94SE81d3lYUmpveW9Xc3BXMDAwSVg0S0E3ZxIEODA1MRoBMyoAMAA4AUAAGAAgz9XLlQZKAhAB",
+    googleReviewUrl: "https://www.google.com/gasearch?q=mudoven%20vijaynagar&source=sh/x/gs/m2/5#sv=CAESzQEKuQEStgEKd0FKaVQ0dElURG5rN2lXWkg3clJQMFZnemZSU1Q1bTlNb1V4V3ExdjhUZHdZcjhkM0t3MHV4N2wtWlBLanh4U1AzSk5Ub0tibDNuNXNNVXhpSHNyRnJQLTlhZlAxbEZJQWh0VDAwRk1JY2RfeWI3UWNCTkdSR2tzEhdKQVMtYXNpV09iU05zZU1QeE1Uc3NRYxoiQURzcjlmVE94SE81d3lYUmpveW9Xc3BXMDAwSVg0S0E3ZxIEODA1MRoBMyoAMAA4AUAAGAAg1brQsgY6AEoCEAE",
     instagramUrl: "https://www.instagram.com/mudoven_indore?stkn=MTl0c2Q4eWVueXkwNg==",
     instagramHandle: "@mudoven_indore",
 
